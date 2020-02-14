@@ -8,6 +8,7 @@ from custom_util import prompt_saving, floodfill, crop_reserve, crop_remove, Flo
 from models import Segment
 import os
 import open3d as o3d
+import copy
 
 
 class AtlasAnnotationTool(QWidget):
@@ -49,6 +50,7 @@ class AtlasAnnotationTool(QWidget):
         self.populateSegmentList()
 
         # color field for point cloud
+        self.old_colors = None
         self.colors = None
 
         # Demo
@@ -116,7 +118,6 @@ class AtlasAnnotationTool(QWidget):
         except ValueError as e:
             self.writeMessage("ERR: Index is not an int --> {}".format(current_item_text.split(" | ")[0]))
 
-
     def btn_common_load_clicked(self):
         '''
         When load is clicked, load the file and render it onto the upper scene
@@ -132,9 +133,9 @@ class AtlasAnnotationTool(QWidget):
             points = np.asarray(pcd.points)
             cmap = color.get_colormap('viridis')
             self.colors = np.concatenate(list(map(cmap.map, np.linspace(0, 1, len(points)))))
+            self.old_colors = copy.deepcopy(self.colors)
             self.upperScene.marker.set_gl_state('translucent', blend=True, depth_test=True)
-            self.upperScene.marker.set_data(points, face_color=self.colors, symbol='o', size=self.point_size, edge_color=None)
-
+            self.upperScene.marker.set_data(points, face_color=self.old_colors, symbol='o', size=self.point_size, edge_color=None)
 
     def btn_floodfill_done_clicked(self):
         '''
@@ -157,6 +158,13 @@ class AtlasAnnotationTool(QWidget):
 
         except Exception as e:
             self.writeMessage(str(e))
+        
+        # clean upperScene
+        pcd = self.upperScene.pcd
+        points = np.asarray(pcd.points)
+        self.colors = copy.deepcopy(self.old_colors)
+        self.upperScene.marker.set_data(points, face_color=self.old_colors, symbol='o', size=self.point_size, edge_color=None)
+
         self.writeMessage("Selected Points is cleared")
         self.selected_points_id = []
 
@@ -168,6 +176,13 @@ class AtlasAnnotationTool(QWidget):
         '''
         self.writeMessage("Selected Segmentation Cancelled".format(len(self.selected_points_id)))
         self.selected_points_id = []
+
+        # clean upperScene
+        pcd = self.upperScene.pcd
+        points = np.asarray(pcd.points)
+        self.colors = copy.deepcopy(self.old_colors)
+        self.upperScene.marker.set_data(points, face_color=self.old_colors, symbol='o', size=self.point_size, edge_color=None)
+
         self.current_result_point_indices = []
         self.lowerScene.clear()
 
