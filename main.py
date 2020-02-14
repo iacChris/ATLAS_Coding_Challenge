@@ -130,7 +130,7 @@ class AtlasAnnotationTool(QWidget):
             # change color
             pcd = self.upperScene.pcd
             points = np.asarray(pcd.points)
-            
+            cmap = color.get_colormap('viridis')
             self.colors = np.concatenate(list(map(cmap.map, np.linspace(0, 1, len(points)))))
             self.upperScene.marker.set_gl_state('translucent', blend=True, depth_test=True)
             self.upperScene.marker.set_data(points, face_color=self.colors, symbol='o', size=self.point_size, edge_color=None)
