@@ -50,8 +50,10 @@ class AtlasAnnotationTool(QWidget):
         self.populateSegmentList()
 
         # color field for point cloud
-        self.old_colors = None
-        self.colors = None
+        self.cmap = color.get_colormap('viridis')
+        self.upperColor = None
+        self.lowerColor = None
+        self.upperCurColor = None
 
         # Demo
         # self.addSegmentationItems(["Placeholder 1", "Placeholder 2"])
@@ -128,14 +130,7 @@ class AtlasAnnotationTool(QWidget):
             self.current_data_file_name = filename
             self.writeMessage("Opening file <{}>".format(filename))
             self.upperScene.render(o3d.io.read_point_cloud(filename))
-            # change color for upperScene
-            pcd = self.upperScene.pcd
-            points = np.asarray(pcd.points)
-            cmap = color.get_colormap('viridis')
-            self.colors = np.concatenate(list(map(cmap.map, np.linspace(0, 1, len(points)))))
-            self.old_colors = copy.deepcopy(self.colors)
-            self.upperScene.marker.set_gl_state('translucent', blend=True, depth_test=True)
-            self.upperScene.marker.set_data(points, face_color=self.old_colors, symbol='o', size=self.point_size, edge_color=None)
+            self.renderScene(self.upperScene, findColor=True)   # change color for upperScene
 
     def btn_floodfill_done_clicked(self):
         '''
@@ -149,22 +144,10 @@ class AtlasAnnotationTool(QWidget):
             self.current_result_point_indices = surface_to_crop
             new_pcd = crop_reserve(self.upperScene.pcd, surface_to_crop)
             self.lowerScene.render(new_pcd)
-            # change color for lowerScene
-            points = np.asarray(new_pcd.points)
-            cmap = color.get_colormap('viridis')
-            lower_colors = np.concatenate(list(map(cmap.map, np.linspace(0, 1, len(points)))))
-            self.lowerScene.marker.set_gl_state('translucent', blend=True, depth_test=True)
-            self.lowerScene.marker.set_data(points, face_color=lower_colors, symbol='o', size=self.point_size, edge_color=None)
-
+            self.renderScene(self.lowerScene, findColor=True)   # change color for lowerScene
         except Exception as e:
             self.writeMessage(str(e))
-        
-        # clean upperScene
-        pcd = self.upperScene.pcd
-        points = np.asarray(pcd.points)
-        self.colors = copy.deepcopy(self.old_colors)
-        self.upperScene.marker.set_data(points, face_color=self.old_colors, symbol='o', size=self.point_size, edge_color=None)
-
+        self.renderScene(self.upperScene)   # clean upperScene
         self.writeMessage("Selected Points is cleared")
         self.selected_points_id = []
 
@@ -176,13 +159,7 @@ class AtlasAnnotationTool(QWidget):
         '''
         self.writeMessage("Selected Segmentation Cancelled".format(len(self.selected_points_id)))
         self.selected_points_id = []
-
-        # clean upperScene
-        pcd = self.upperScene.pcd
-        points = np.asarray(pcd.points)
-        self.colors = copy.deepcopy(self.old_colors)
-        self.upperScene.marker.set_data(points, face_color=self.old_colors, symbol='o', size=self.point_size, edge_color=None)
-
+        self.renderScene(self.upperScene)   # clean upperScene
         self.current_result_point_indices = []
         self.lowerScene.clear()
 
@@ -264,7 +241,7 @@ class AtlasAnnotationTool(QWidget):
             finally:
                 self.upperScene.marker.update_gl_state(blend=True)
                 self.upperScene.marker.antialias = 1
-                self.upperScene.marker.set_data(points, face_color=self.colors, **kwargs)
+                self.upperScene.marker.set_data(points, face_color=self.upperCurColor, **kwargs)
             # We pick the pixel directly under the click, unless it is
             # zero, in which case we look for the most common nonzero
             # pixel value in a square region centered on the click.
@@ -282,10 +259,32 @@ class AtlasAnnotationTool(QWidget):
                     self.selected_points_id.append(idx)  # TODO how to you not add a point if it is index out of range
                     self.writeMessage("Selected Points {}".format(self.selected_points_id))
                     # turn the on_click point white
-                    self.colors[idx - 1] =  (1, 1, 1, 1)
-                    self.upperScene.marker.set_data(points, face_color=self.colors, **kwargs)
+                    self.upperCurColor[idx - 1] =  (1, 1, 1, 1)
+                    self.upperScene.marker.set_data(points, face_color=self.upperCurColor, **kwargs)
                 except IndexError:
                     self.writeMessage("The point {} is not in the point cloud".format(idx))
+
+    # helper function: render scene for a better visulization for on click point
+    def renderScene(self, scene, findColor=False):
+        if scene is self.upperScene:
+            if findColor:
+                self.upperColor = self.findColor(self.upperScene)
+            self.upperCurColor = copy.deepcopy(self.upperColor)  # if upperScene, reset using_colors
+            points = np.asarray(self.upperScene.pcd.points)
+            render_color = self.upperColor
+        else:
+            if findColor:
+                self.lowerColor = self.findColor(self.lowerScene)
+            points = np.asarray(self.lowerScene.pcd.points)
+            render_color = self.lowerColor
+        scene.marker.set_gl_state('translucent', blend=True, depth_test=True)
+        scene.marker.set_data(points, face_color=render_color, symbol='o', size=self.point_size, edge_color=None)
+
+    # helper function: find suitable color of a scene
+    def findColor(self, scene):
+        points = np.asarray(scene.pcd.points)
+        return np.concatenate(list(map(self.cmap.map, np.linspace(0, 1, len(points)))))
+
 
     ####### UTILITIES FUNCTIONS #######
 
