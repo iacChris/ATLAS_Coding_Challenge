@@ -127,7 +127,7 @@ class AtlasAnnotationTool(QWidget):
             self.current_data_file_name = filename
             self.writeMessage("Opening file <{}>".format(filename))
             self.upperScene.render(o3d.io.read_point_cloud(filename))
-            # change color
+            # change color for upperScene
             pcd = self.upperScene.pcd
             points = np.asarray(pcd.points)
             cmap = color.get_colormap('viridis')
@@ -148,10 +148,12 @@ class AtlasAnnotationTool(QWidget):
             self.current_result_point_indices = surface_to_crop
             new_pcd = crop_reserve(self.upperScene.pcd, surface_to_crop)
             self.lowerScene.render(new_pcd)
-            # change color
+            # change color for lowerScene
             points = np.asarray(new_pcd.points)
+            cmap = color.get_colormap('viridis')
+            lower_colors = np.concatenate(list(map(cmap.map, np.linspace(0, 1, len(points)))))
             self.lowerScene.marker.set_gl_state('translucent', blend=True, depth_test=True)
-            self.lowerScene.marker.set_data(points, face_color=self.colors, symbol='o', size=self.point_size, edge_color=None)
+            self.lowerScene.marker.set_data(points, face_color=lower_colors, symbol='o', size=self.point_size, edge_color=None)
 
         except Exception as e:
             self.writeMessage(str(e))
@@ -244,7 +246,6 @@ class AtlasAnnotationTool(QWidget):
                                                      2 * 10 + 1,
                                                      2 * 10 + 1), 
                                                      bgcolor=(0,0,0,0))
-                # TODO make the dots appear
             finally:
                 self.upperScene.marker.update_gl_state(blend=True)
                 self.upperScene.marker.antialias = 1
@@ -265,7 +266,7 @@ class AtlasAnnotationTool(QWidget):
                     points[idx]
                     self.selected_points_id.append(idx)  # TODO how to you not add a point if it is index out of range
                     self.writeMessage("Selected Points {}".format(self.selected_points_id))
-                    # turn the point white
+                    # turn the on_click point white
                     self.colors[idx - 1] =  (1, 1, 1, 1)
                     self.upperScene.marker.set_data(points, face_color=self.colors, **kwargs)
                 except IndexError:
