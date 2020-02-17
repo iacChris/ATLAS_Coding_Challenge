@@ -56,6 +56,9 @@ class AtlasAnnotationTool(QWidget):
         self.lowerColor = None
         self.upperCurColor = None
 
+        # Your Function
+        self.btn_func_crop = None
+
         # Demo
         # self.addSegmentationItems(["Placeholder 1", "Placeholder 2"])
         # pcd = o3d.io.read_point_cloud("./data/scene.ply")
@@ -72,6 +75,9 @@ class AtlasAnnotationTool(QWidget):
         self.btn_common_save.clicked.connect(self.btn_save_clicked)
         self.btn_common_delete.clicked.connect(self.btn_delete_clicked)
         self.segmentation_list.itemDoubleClicked.connect(self.segmentation_list_item_double_clicked)
+
+        # connect Your Function
+        self.btn_func_crop.clicked.connect(self.btn_func_crop_clicked)
 
 
     def wireWidgets(self):
@@ -93,6 +99,10 @@ class AtlasAnnotationTool(QWidget):
         tab_floodfill = self.base_form.system_mode_layout.itemAt(0).widget()
         self.btn_floodfill_done = tab_floodfill.widget(0).children()[1]
         self.btn_floodfill_cancel = tab_floodfill.widget(0).children()[2]
+
+        # Yourfunction wiring
+        self.btn_func_crop = self.window.findChild(QPushButton, 'btn_func_crop')
+
 
 
     def setUpDisplay(self):
@@ -265,6 +275,11 @@ class AtlasAnnotationTool(QWidget):
                     self.upperScene.marker.set_data(points, face_color=self.upperCurColor, **kwargs)
                 except IndexError:
                     self.writeMessage("The point {} is not in the point cloud".format(idx))
+
+    # helper function: crop with index
+    def btn_func_crop_clicked(self):
+        self.writeMessage("Hello World!")
+
 
     # helper function: render scene for a better visulization for on click point
     def renderScene(self, scene, findColor=False):
