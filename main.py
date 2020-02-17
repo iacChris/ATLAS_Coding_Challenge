@@ -50,6 +50,7 @@ class AtlasAnnotationTool(QWidget):
         self.populateSegmentList()
 
         # color field for point cloud
+        self.load = False
         self.cmap = color.get_colormap('viridis')
         self.upperColor = None
         self.lowerColor = None
@@ -131,6 +132,7 @@ class AtlasAnnotationTool(QWidget):
             self.writeMessage("Opening file <{}>".format(filename))
             self.upperScene.render(o3d.io.read_point_cloud(filename))
             self.renderScene(self.upperScene, findColor=True)   # change color for upperScene
+            self.load = True
 
     def btn_floodfill_done_clicked(self):
         '''
@@ -147,7 +149,7 @@ class AtlasAnnotationTool(QWidget):
             self.renderScene(self.lowerScene, findColor=True)   # change color for lowerScene
         except Exception as e:
             self.writeMessage(str(e))
-        self.renderScene(self.upperScene)   # clean upperScene
+        if self.load: self.renderScene(self.upperScene)   # clean upperScene
         self.writeMessage("Selected Points is cleared")
         self.selected_points_id = []
 
@@ -159,7 +161,7 @@ class AtlasAnnotationTool(QWidget):
         '''
         self.writeMessage("Selected Segmentation Cancelled".format(len(self.selected_points_id)))
         self.selected_points_id = []
-        self.renderScene(self.upperScene)   # clean upperScene
+        if self.load: self.renderScene(self.upperScene)   # clean upperScene
         self.current_result_point_indices = []
         self.lowerScene.clear()
 

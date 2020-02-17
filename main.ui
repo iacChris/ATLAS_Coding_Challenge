@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1377</width>
-    <height>813</height>
+    <width>835</width>
+    <height>529</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,13 +20,43 @@
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="2" column="0">
+    <layout class="QVBoxLayout" name="message_center_layout">
+     <item>
+      <widget class="QTextEdit" name="textEdit">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QAbstractScrollArea::AdjustToContents</enum>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+       <property name="overwriteMode">
+        <bool>true</bool>
+       </property>
+       <property name="placeholderText">
+        <string>&gt; Program Started, UI Loaded Correctly</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="1">
+    <layout class="QVBoxLayout" name="segmentation_layout">
+     <item>
+      <widget class="QListWidget" name="listWidget"/>
+     </item>
+    </layout>
+   </item>
    <item row="0" column="0" rowspan="2">
     <layout class="QGridLayout" name="data_display_window">
-     <item row="1" column="0">
-      <widget class="QWidget" name="top" native="true"/>
-     </item>
      <item row="2" column="0">
       <widget class="QWidget" name="lower" native="true"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QWidget" name="top" native="true"/>
      </item>
     </layout>
    </item>
@@ -90,32 +120,67 @@
         <attribute name="title">
          <string>Your Function</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout">
-           <item>
-            <widget class="QPushButton" name="btn_floodfill_done">
-             <property name="text">
-              <string>Test_1</string>
-             </property>
-             <property name="autoDefault">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="btn_floodfill_cancel">
-             <property name="text">
-              <string>Test_2</string>
-             </property>
-             <property name="autoDefault">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
+        <widget class="QWidget" name="verticalLayoutWidget">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>20</y>
+           <width>141</width>
+           <height>131</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>X</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPlainTextEdit" name="func_x_pos"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>Y</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPlainTextEdit" name="func_y_pos"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Z</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPlainTextEdit" name="func_z_pos"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_func_crop">
+            <property name="text">
+             <string>Crop</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </widget>
      </item>
@@ -152,36 +217,6 @@
         <bool>false</bool>
        </property>
       </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="2" column="0">
-    <layout class="QVBoxLayout" name="message_center_layout">
-     <item>
-      <widget class="QTextEdit" name="textEdit">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="sizeAdjustPolicy">
-        <enum>QAbstractScrollArea::AdjustToContents</enum>
-       </property>
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-       <property name="overwriteMode">
-        <bool>true</bool>
-       </property>
-       <property name="placeholderText">
-        <string>&gt; Program Started, UI Loaded Correctly</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="2" column="1">
-    <layout class="QVBoxLayout" name="segmentation_layout">
-     <item>
-      <widget class="QListWidget" name="listWidget"/>
      </item>
     </layout>
    </item>
